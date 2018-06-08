@@ -55,6 +55,4 @@ var _ = AfterSuite(func() {
 	if testSetup != nil {
 		testSetup.Teardown()
 	}
-	cmd := exec.Command("rm", appBinary)
-	Expect(cmd.Run()).To(Succeed())
 })

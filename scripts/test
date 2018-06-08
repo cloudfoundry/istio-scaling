@@ -2,4 +2,4 @@
 
 go install code.cloudfoundry.org/istio-acceptance-tests/vendor/github.com/onsi/ginkgo/ginkgo
 
-ginkgo -v -r -failOnPending -randomizeAllSpecs -p "$@"
+ginkgo -v -r -failOnPending -randomizeAllSpecs
