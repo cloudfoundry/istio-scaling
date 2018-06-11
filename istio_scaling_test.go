@@ -67,6 +67,8 @@ func pushApp(completed chan struct{}) {
 		"-d", cfg.IstioDomain,
 		"-i", fmt.Sprintf("\"%d\"", testPlan.AppInstances),
 		"-b", "binary_buildpack",
+		"-m", "15M",
+		"-k", "20M",
 		"-c", "./"+appBinary,
 	).Wait(defaultTimeout)).To(Exit(0))
 
