@@ -50,9 +50,3 @@ var _ = BeforeSuite(func() {
 	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
 	testSetup.Setup()
 })
-
-var _ = AfterSuite(func() {
-	if testSetup != nil {
-		testSetup.Teardown()
-	}
-})
