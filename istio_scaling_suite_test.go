@@ -47,7 +47,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(testPlan.Validate()).To(Succeed())
 
-	testSetup = workflowhelpers.NewTestSuiteSetup(cfg)
+	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
 	testSetup.Setup()
 })
 
