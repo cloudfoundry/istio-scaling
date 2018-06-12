@@ -1,9 +1,0 @@
----
-applications:
-- name: hello-app
-  memory: 32M
-  disk_quota: 32M
-  buildpack: go_buildpack
-  env:
-    GOVERSION: go1
-    GOPACKAGENAME: hello-app

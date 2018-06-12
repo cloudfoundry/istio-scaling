@@ -1,7 +1,6 @@
 package scaling_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -16,8 +15,9 @@ import (
 )
 
 var (
-	appNames    []string
-	appNameLock sync.Mutex
+	appNames       []string
+	appNameLock    sync.Mutex
+	appDropletPath = "assets/dora-droplet.tar.gz"
 )
 
 var _ = Describe("Istio scaling", func() {
@@ -44,15 +44,7 @@ var _ = Describe("Istio scaling", func() {
 
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).ToNot(HaveOccurred())
-
-				type AppResponse struct {
-					Greeting string `json:"greeting"`
-				}
-
-				var appResp AppResponse
-				err = json.Unmarshal(body, &appResp)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(appResp.Greeting).To(Equal("hello"))
+				Expect(string(body)).To(Equal("Hi, I'm Dora!"))
 			}
 		})
 	})
@@ -65,11 +57,10 @@ func pushApp(completed chan struct{}) {
 	appNameLock.Unlock()
 	Expect(cf.Cf("push", appName,
 		"-d", cfg.IstioDomain,
+		"--droplet", appDropletPath,
 		"-i", fmt.Sprintf("\"%d\"", testPlan.AppInstances),
-		"-b", "binary_buildpack",
-		"-m", "15M",
-		"-k", "20M",
-		"-c", "./"+appBinary,
+		"-m", "16M",
+		"-k", "75M",
 	).Wait(defaultTimeout)).To(Exit(0))
 
 	appURL := fmt.Sprintf("http://%s.%s", appName, cfg.IstioDomain)

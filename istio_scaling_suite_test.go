@@ -2,7 +2,6 @@ package scaling_test
 
 import (
 	"os"
-	"os/exec"
 	"testing"
 	"time"
 
@@ -18,22 +17,14 @@ func TestIstioScaling(t *testing.T) {
 }
 
 var (
-	cfg               config.Config
-	testPlan          config.TestPlan
-	testSetup         *workflowhelpers.ReproducibleTestSuiteSetup
-	defaultTimeout    = 240 * time.Second
-	helloRoutingAsset = "assets/hello-golang/site.go"
-	appBinary         = "assets/site"
-	appManifest       = "assets/hello-golang/manifest.yml"
+	cfg            config.Config
+	testPlan       config.TestPlan
+	testSetup      *workflowhelpers.ReproducibleTestSuiteSetup
+	defaultTimeout = 240 * time.Second
 )
 
 var _ = BeforeSuite(func() {
 	var err error
-	cmd := exec.Command("go", "build", "-o", appBinary, helloRoutingAsset)
-	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, "GOOS=linux")
-	cmd.Env = append(cmd.Env, "GOARCH=amd64")
-	Expect(cmd.Run()).To(Succeed())
 
 	configPath := os.Getenv("CONFIG")
 	Expect(configPath).NotTo(BeEmpty())
