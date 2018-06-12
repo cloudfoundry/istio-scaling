@@ -21,6 +21,13 @@
   packages = [
     ".",
     "config",
+    "ginkgo",
+    "ginkgo/convert",
+    "ginkgo/interrupthandler",
+    "ginkgo/nodot",
+    "ginkgo/testrunner",
+    "ginkgo/testsuite",
+    "ginkgo/watch",
     "internal/codelocation",
     "internal/containernode",
     "internal/failer",
@@ -70,13 +77,13 @@
     "html/atom",
     "html/charset"
   ]
-  revision = "1e491301e022f8f977054da4c2d852decd59571f"
+  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "9527bec2660bd847c050fda93a0f0c6dee0800bb"
+  revision = "a9e25c09b96b8870693763211309e213c6ef299d"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -111,6 +118,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "56e32acf375a22c3d05277ee9a36017779d7f6985a1b57438ed962217f6434f3"
+  inputs-digest = "0d7a12212cf50ceb7f18b0c8cb50ca1134be4933dd3184264f42987d76fea3c8"
   solver-name = "gps-cdcl"
   solver-version = 1
