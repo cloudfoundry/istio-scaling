@@ -5,13 +5,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/generator"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gexec"
 )
 
 var (
@@ -26,21 +26,45 @@ var _ = Describe("Istio scaling", func() {
 
 		BeforeEach(func() {
 			By(fmt.Sprintf("pushing %d apps", testPlan.NumApps))
-			completed := make(chan struct{}, testPlan.NumApps)
+			var wg sync.WaitGroup
+			wg.Add(testPlan.NumApps)
+
 			for i := 0; i < testPlan.NumApps; i++ {
-				go pushApp(completed)
+				go func() {
+					defer wg.Done()
+					for {
+						status, appName := pushApp()
+						if status != 0 {
+							cf.Cf("delete", appName, "-f", "-r").Wait(defaultTimeout)
+							time.Sleep(2 * time.Second)
+
+							continue
+						}
+
+						return
+					}
+				}()
 			}
-			Eventually(func() int {
-				return len(completed)
-			}, defaultTimeout).Should(Equal(testPlan.NumApps))
+
+			fmt.Println("waiting for all apps to be up")
+			wg.Wait()
 		})
 
 		It("checks responses", func() {
 			for _, appName := range appNames {
 				appURL := fmt.Sprintf("http://%s.%s", appName, cfg.IstioDomain)
 				By(fmt.Sprintf("send request to app %s", appURL))
-				resp, err := http.Get(appURL)
-				Expect(err).ToNot(HaveOccurred())
+
+				var resp *http.Response
+				Eventually(func() (int, error) {
+					var err error
+					resp, err = http.Get(appURL)
+					if err != nil {
+						return http.StatusTeapot, err
+					}
+
+					return resp.StatusCode, nil
+				}, defaultTimeout).Should(Equal(http.StatusOK))
 
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).ToNot(HaveOccurred())
@@ -50,36 +74,18 @@ var _ = Describe("Istio scaling", func() {
 	})
 })
 
-func pushApp(completed chan struct{}) {
+func pushApp() (int, string) {
 	appName := generator.PrefixedRandomName("SCALING", "APP")
 	appNameLock.Lock()
 	appNames = append(appNames, appName)
 	appNameLock.Unlock()
-	Expect(cf.Cf("push", appName,
+	statusCode := cf.Cf("push", appName,
 		"-d", cfg.IstioDomain,
 		"--droplet", appDropletPath,
 		"-i", fmt.Sprintf("\"%d\"", testPlan.AppInstances),
 		"-m", "16M",
 		"-k", "75M",
-	).Wait(defaultTimeout)).To(Exit(0))
+	).Wait(defaultTimeout).ExitCode()
 
-	appURL := fmt.Sprintf("http://%s.%s", appName, cfg.IstioDomain)
-	Eventually(func() (bool, error) {
-		statusCode, err := getStatusCode(appURL)
-		if err == nil {
-			if statusCode == http.StatusOK {
-				completed <- struct{}{}
-				return true, nil
-			}
-		}
-		return false, err
-	}, defaultTimeout).Should(BeTrue())
-}
-
-func getStatusCode(appURL string) (int, error) {
-	resp, err := http.Get(appURL)
-	if err != nil {
-		return 0, err
-	}
-	return resp.StatusCode, nil
+	return statusCode, appName
 }

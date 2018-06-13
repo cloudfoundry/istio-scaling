@@ -9,8 +9,9 @@ import (
 )
 
 type TestPlan struct {
-	NumApps      int `json:"number_of_apps"`
-	AppInstances int `json:"app_instances"`
+	NumApps      int  `json:"number_of_apps"`
+	AppInstances int  `json:"app_instances"`
+	Cleanup      bool `json:"cleanup"`
 }
 
 func NewPlan(path string) (TestPlan, error) {

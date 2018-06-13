@@ -6,9 +6,11 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/istio-scaling/config"
+	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/workflowhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gexec"
 )
 
 func TestIstioScaling(t *testing.T) {
@@ -20,7 +22,7 @@ var (
 	cfg            config.Config
 	testPlan       config.TestPlan
 	testSetup      *workflowhelpers.ReproducibleTestSuiteSetup
-	defaultTimeout = 240 * time.Second
+	defaultTimeout = 600 * time.Second
 )
 
 var _ = BeforeSuite(func() {
@@ -40,4 +42,11 @@ var _ = BeforeSuite(func() {
 
 	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
 	testSetup.Setup()
+})
+
+var _ = AfterEach(func() {
+	if testPlan.Cleanup && testSetup != nil {
+		testSetup.Teardown()
+		Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(defaultTimeout)).To(Exit(0))
+	}
 })
