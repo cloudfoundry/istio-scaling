@@ -17,7 +17,7 @@ import (
 var (
 	appNames       []string
 	appNameLock    sync.Mutex
-	appDropletPath = "assets/dora-droplet.tar.gz"
+	appDropletPath = "assets/hello-golang.tgz"
 )
 
 var _ = Describe("Istio scaling", func() {
@@ -68,7 +68,7 @@ var _ = Describe("Istio scaling", func() {
 
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(body)).To(Equal("Hi, I'm Dora!"))
+				Expect(string(body)).To(ContainSubstring("hello"))
 			}
 		})
 	})
