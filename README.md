@@ -9,11 +9,11 @@ This repository is for testing istio scalability on Cloud Foundry
 ```sh
 cat << EOF > "${PWD}/config.json"
 {
-	"cf_admin_user": "admin",
-	"cf_admin_password": <admin password>,
-	"cf_internal_apps_domain": "apps.internal",
-        "cf_system_domain": "<system-domain>",
-	"cf_istio_domain": "istio.<system-domain>",
+  "cf_admin_user": "admin",
+  "cf_admin_password": <admin password>,
+  "cf_internal_apps_domain": "apps.internal",
+  "cf_system_domain": "<system-domain>",
+  "cf_istio_domain": "istio.<system-domain>"
 }
 EOF
 ```
@@ -23,7 +23,8 @@ EOF
 cat << EOF > "${PWD}/plan.json"
 {
   "number_of_apps": 10,
-  "app_instances": 1
+  "app_instances": 1,
+  "cleanup": false
 }
 EOF
 ```
@@ -31,4 +32,8 @@ EOF
 ## Running Tests
 ```sh
 CONFIG="$PWD/config.json" PLAN="$PWD/plan.json" scripts/test
+```
+## Running CATS
+```sh
+You can run CATS after running scalling tests as you would usually, however be sure to the set the flag cleanup in the plan file to false and manually delete your org.
 ```
