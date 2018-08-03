@@ -46,7 +46,10 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterEach(func() {
 	if testPlan.Cleanup && testSetup != nil {
-		Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(defaultTimeout)).To(Exit(0))
+		workflowhelpers.AsUser(testSetup.AdminUserContext(), defaultTimeout, func() {
+			Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(defaultTimeout)).To(Exit(0))
+		})
+
 		testSetup.Teardown()
 	}
 })
