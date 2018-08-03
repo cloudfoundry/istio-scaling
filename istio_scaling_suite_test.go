@@ -46,7 +46,7 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterEach(func() {
 	if testPlan.Cleanup && testSetup != nil {
-		testSetup.Teardown()
 		Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(defaultTimeout)).To(Exit(0))
+		testSetup.Teardown()
 	}
 })
