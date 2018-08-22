@@ -22,7 +22,7 @@ var (
 	cfg            config.Config
 	testPlan       config.TestPlan
 	testSetup      *workflowhelpers.ReproducibleTestSuiteSetup
-	defaultTimeout = 120 * time.Second
+	defaultTimeout = 30 * time.Second
 )
 
 var _ = BeforeSuite(func() {
