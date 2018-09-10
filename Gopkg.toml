@@ -31,6 +31,10 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
   name = "github.com/cloudfoundry-incubator/cf-test-helpers"
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/cloudfoundry/bosh-cli"
+
+[[constraint]]
   name = "github.com/onsi/ginkgo"
   version = "1.5.0"
 

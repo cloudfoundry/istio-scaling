@@ -10,7 +10,7 @@ This repository is for testing istio scalability on Cloud Foundry
 cat << EOF > "${PWD}/config.json"
 {
   "cf_admin_user": "admin",
-  "cf_admin_password": <admin password>,
+  "cf_admin_password": "<admin password>",
   "cf_internal_apps_domain": "apps.internal",
   "cf_system_domain": "<system-domain>",
   "cf_istio_domain": "istio.<system-domain>"
