@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
@@ -34,7 +35,7 @@ var _ = Describe("Control Plane Failure", func() {
 				DirectorCA:       os.Getenv("BOSH_CA_CERT"),
 				DirectorUser:     os.Getenv("BOSH_CLIENT"),
 				DirectorPassword: os.Getenv("BOSH_CLIENT_SECRET"),
-				DirectorUAAURL:   "https://10.0.0.6:8443",
+				DirectorUAAURL:   fmt.Sprintf("%s:8443", strings.TrimSuffix(os.Getenv("BOSH_ENVIRONMENT"), ":25555")),
 				DirectorURL:      os.Getenv("BOSH_ENVIRONMENT"),
 				DeploymentName:   os.Getenv("BOSH_DEPLOYMENT"),
 			}
