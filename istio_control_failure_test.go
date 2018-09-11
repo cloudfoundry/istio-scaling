@@ -71,7 +71,7 @@ var _ = Describe("Control Plane Failure", func() {
 		})
 
 		AfterEach(func() {
-			cf.Cf("delete-route", cfg.IstioDomain, hostname)
+			cf.Cf("delete-route", cfg.IstioDomain, "--hostname", hostname)
 		})
 
 		It("returns to normal operation after some time", func() {
