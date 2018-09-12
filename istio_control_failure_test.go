@@ -132,7 +132,7 @@ var _ = Describe("Control Plane Failure", func() {
 				}
 
 				return resp.StatusCode, nil
-			}, defaultTimeout, "30s").Should(Equal(http.StatusOK))
+			}, routeTimeout, "5s").Should(Equal(http.StatusOK))
 		})
 	})
 })

@@ -27,7 +27,7 @@ var _ = Describe("Istio scaling", func() {
 					}
 
 					return resp.StatusCode, nil
-				}, defaultTimeout, "2s").Should(Equal(http.StatusOK))
+				}, routeTimeout, "2s").Should(Equal(http.StatusOK))
 
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).ToNot(HaveOccurred())
