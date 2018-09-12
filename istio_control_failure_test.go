@@ -72,6 +72,15 @@ var _ = Describe("Control Plane Failure", func() {
 
 		AfterEach(func() {
 			cf.Cf("delete-route", cfg.IstioDomain, "--hostname", hostname)
+
+			vms, err := deployment.VMInfos()
+			Expect(err).NotTo(HaveOccurred())
+
+			for _, vm := range vms {
+				if vm.JobName == "istio-control" && vm.ProcessState == "stopped" {
+					deployment.Start(instance, boshdir.StartOpts{})
+				}
+			}
 		})
 
 		It("returns to normal operation after some time", func() {
