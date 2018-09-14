@@ -70,7 +70,7 @@ var _ = BeforeSuite(func() {
 	push(testPlan.NumApps, testPlan.Concurrency)
 })
 
-var _ = AfterEach(func() {
+var _ = AfterSuite(func() {
 	if testPlan.Cleanup && testSetup != nil {
 		workflowhelpers.AsUser(testSetup.AdminUserContext(), defaultTimeout, func() {
 			Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(defaultTimeout)).To(Exit(0))
