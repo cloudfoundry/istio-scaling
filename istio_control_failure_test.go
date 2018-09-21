@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
+	"github.com/cloudfoundry-incubator/cf-test-helpers/generator"
 	boshdir "github.com/cloudfoundry/bosh-cli/director"
 	boshuaa "github.com/cloudfoundry/bosh-cli/uaa"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -66,12 +67,12 @@ var _ = Describe("Control Plane Failure", func() {
 			deployment, err = director.FindDeployment(options.DeploymentName)
 			Expect(err).NotTo(HaveOccurred())
 
-			hostname = "failure-test-route"
+			hostname = generator.PrefixedRandomName("FAILURE-TEST", "HOST")
 			instance = boshdir.NewAllOrInstanceGroupOrInstanceSlug("istio-control", "0")
 		})
 
 		AfterEach(func() {
-			cf.Cf("delete-route", cfg.IstioDomain, "--hostname", hostname)
+			cf.Cf("delete-route", cfg.IstioDomain, "--hostname", hostname, "-f")
 
 			vms, err := deployment.VMInfos()
 			Expect(err).NotTo(HaveOccurred())
