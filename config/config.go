@@ -10,11 +10,10 @@ import (
 )
 
 type Config struct {
-	CFSystemDomain       string `json:"cf_system_domain"`
-	CFInternalAppsDomain string `json:"cf_internal_apps_domain"`
-	IstioDomain          string `json:"cf_istio_domain"`
-	AdminUser            string `json:"cf_admin_user"`
-	AdminPassword        string `json:"cf_admin_password"`
+	CFSystemDomain string `json:"cf_system_domain"`
+	IstioDomain    string `json:"cf_istio_domain"`
+	AdminUser      string `json:"cf_admin_user"`
+	AdminPassword  string `json:"cf_admin_password"`
 }
 
 func NewConfig(path string) (Config, error) {
@@ -44,9 +43,6 @@ func (c Config) Validate() error {
 	}
 	if c.AdminPassword == "" {
 		missingProperties = append(missingProperties, "cf_admin_password")
-	}
-	if c.CFInternalAppsDomain == "" {
-		missingProperties = append(missingProperties, "cf_internal_apps_domain")
 	}
 	if len(missingProperties) > 0 {
 		return errors.New(fmt.Sprintf("Missing required config properties: %s", strings.Join(missingProperties, ", ")))

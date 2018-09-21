@@ -3,47 +3,30 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:57d862d83c6c53d8d645827878df9667ac3d1ac7f22717190a698110dfb7aabe"
   name = "code.cloudfoundry.org/clock"
   packages = ["."]
-  pruneopts = "UT"
   revision = "02e53af36e6c978af692887ed449b74026d76fec"
 
 [[projects]]
-  branch = "master"
-  digest = "1:36328d1892171576f134fee12eefccc4f6e6f000ea1816bd55279a8f87abf8e9"
-  name = "code.cloudfoundry.org/istio-scaling"
-  packages = ["config"]
-  pruneopts = "UT"
-  revision = "dacdec2c5f18e38a4acb84a7bf71dedeb4a1bc77"
-
-[[projects]]
-  digest = "1:2aaf2cc045d0219bba79655e4df795b973168c310574669cb75786684f7287d3"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
-  pruneopts = "UT"
   revision = "85a78806aa1b4707d1dbace9be592cf1ece91ab3"
   version = "v1.1.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:58927c45bfdcd6550e5f1ab008eeeb6951474a232afa1dc690583f26c5f92cbd"
   name = "github.com/charlievieth/fs"
   packages = ["."]
-  pruneopts = "UT"
   revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
 
 [[projects]]
   branch = "master"
-  digest = "1:d8cd4f14785b5ae65100524a29ebba8b9dfc5401020fe7504f80b438bb8e8e0d"
   name = "github.com/cheggaaa/pb"
   packages = ["."]
-  pruneopts = "UT"
   revision = "2af8bbdea9e99e83b3ac400d8f6b6d1b8cbbf338"
 
 [[projects]]
   branch = "master"
-  digest = "1:ff270e804a7e9f5546c6f92c04d6ee1ca394c0d08cb6b5baed000724f1baa76a"
   name = "github.com/cloudfoundry-incubator/cf-test-helpers"
   packages = [
     "cf",
@@ -53,28 +36,24 @@
     "internal",
     "silentcommandstarter",
     "workflowhelpers",
-    "workflowhelpers/internal",
+    "workflowhelpers/internal"
   ]
-  pruneopts = "UT"
   revision = "d6496ec83a32fc46bb79b2c7e949b3e4c27fbe82"
 
 [[projects]]
   branch = "master"
-  digest = "1:a6ba46b1f09620e3072bb15c83a0bee649512bb5aa3f1f68d752833795db11cf"
   name = "github.com/cloudfoundry/bosh-cli"
   packages = [
     "director",
     "uaa",
     "ui",
     "ui/fmt",
-    "ui/table",
+    "ui/table"
   ]
-  pruneopts = "UT"
   revision = "d737b7d32f18c232c624cfc069bbb5befe8757da"
 
 [[projects]]
   branch = "master"
-  digest = "1:7c35b7636cb2c1b16d240c683ab57ec105fd7e306ae356e6e1cd39cbf37e91eb"
   name = "github.com/cloudfoundry/bosh-utils"
   packages = [
     "crypto",
@@ -83,85 +62,65 @@
     "logger",
     "retrystrategy",
     "system",
-    "uuid",
+    "uuid"
   ]
-  pruneopts = "UT"
   revision = "407dd7546455f1a0a50feba2dcaef0ae88da1810"
 
 [[projects]]
   branch = "master"
-  digest = "1:a8022e3b5ae297d4c99a589b772c607a15284107fc037127142e177ac16b30a0"
   name = "github.com/cloudfoundry/go-socks5"
   packages = ["."]
-  pruneopts = "UT"
   revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
 
 [[projects]]
   branch = "master"
-  digest = "1:e401218d834d23ecc6d77e178f02321c7cf7105925875184df5fae98be04ec71"
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
-  pruneopts = "UT"
   revision = "3659db090cb23a57807b53e2f8580b2427dc2659"
 
 [[projects]]
   branch = "master"
-  digest = "1:6f6126af7313c78380367bb436b5a2ad8fc79ed0f4b3019ddd0ee1f8150e6877"
   name = "github.com/cppforlife/go-semi-semantic"
   packages = ["version"]
-  pruneopts = "UT"
   revision = "576b6af77ae4f3ccef356902fb3b9a9ae22e0b11"
 
 [[projects]]
   branch = "master"
-  digest = "1:6f9339c912bbdda81302633ad7e99a28dfa5a639c864061f1929510a9a64aa74"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
-  pruneopts = "UT"
   revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
 
 [[projects]]
-  digest = "1:865079840386857c809b72ce300be7580cb50d3d3129ce11bf9aa6ca2bc1934a"
   name = "github.com/fatih/color"
   packages = ["."]
-  pruneopts = "UT"
   revision = "5b77d2a35fb0ede96d138fc9a99f5c9b6aef11b4"
   version = "v1.7.0"
 
 [[projects]]
-  digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
-  pruneopts = "UT"
   revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
   version = "v0.0.9"
 
 [[projects]]
-  digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
-  pruneopts = "UT"
   revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
   version = "v0.0.4"
 
 [[projects]]
-  digest = "1:cdb899c199f907ac9fb50495ec71212c95cb5b0e0a8ee0800da0238036091033"
   name = "github.com/mattn/go-runewidth"
   packages = ["."]
-  pruneopts = "UT"
   revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
   version = "v0.0.3"
 
 [[projects]]
   branch = "master"
-  digest = "1:0e1e5f960c58fdc677212fcc70e55042a0084d367623e51afbdb568963832f5d"
   name = "github.com/nu7hatch/gouuid"
   packages = ["."]
-  pruneopts = "UT"
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:a07caa164b5a159fd3aa419a82ce0eadaff55a7aef202e62253f2fc927cbee1f"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -188,14 +147,12 @@
     "reporters/stenographer",
     "reporters/stenographer/support/go-colorable",
     "reporters/stenographer/support/go-isatty",
-    "types",
+    "types"
   ]
-  pruneopts = "UT"
   revision = "fa5fabab2a1bfbd924faf4c067d07ae414e2aedf"
   version = "v1.5.0"
 
 [[projects]]
-  digest = "1:714c6da391ddef79e2a4f0a892352e203d554f95370fe2c16417071022bc5da1"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -211,33 +168,27 @@
     "matchers/support/goraph/edge",
     "matchers/support/goraph/node",
     "matchers/support/goraph/util",
-    "types",
+    "types"
   ]
-  pruneopts = "UT"
   revision = "62bff4df71bdbc266561a0caee19f0594b17c240"
   version = "v1.4.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:c17d9558383b2b70bf84453b8f0cf17704b8c07f981ab00700e22ebd0137a6d0"
   name = "github.com/pivotal-cf/paraphernalia"
   packages = ["secure/tlsconfig"]
-  pruneopts = "UT"
   revision = "a64ae2051c20c5cde13292a41db01029566134ba"
 
 [[projects]]
-  digest = "1:b54b140b8d4a69b461f678f7ed57c89ef5e5c6343497542c8b697228cb7c8a51"
   name = "github.com/vito/go-interact"
   packages = [
     "interact",
-    "interact/terminal",
+    "interact/terminal"
   ]
-  pruneopts = "UT"
   revision = "fa338ed9e9ecbb0e9c2e6c7a0160d9fc9b0efbd9"
 
 [[projects]]
   branch = "master"
-  digest = "1:0a0319f9ca4ef4105cd909596be58789777f985d3ed96bdd01893bb54f639dda"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -247,14 +198,12 @@
     "internal/subtle",
     "poly1305",
     "ssh",
-    "ssh/terminal",
+    "ssh/terminal"
   ]
-  pruneopts = "UT"
   revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
-  digest = "1:5b55d8077964f11cb65b48911756b022e13c6b55b24d01f3653663b725736808"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -262,24 +211,20 @@
     "html/atom",
     "html/charset",
     "internal/socks",
-    "proxy",
+    "proxy"
   ]
-  pruneopts = "UT"
   revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
 [[projects]]
   branch = "master"
-  digest = "1:84ef7e1695921716afbfd97758757d4b1f7f06983e357b9445a7abfef0c8f0e2"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows",
+    "windows"
   ]
-  pruneopts = "UT"
   revision = "a9e25c09b96b8870693763211309e213c6ef299d"
 
 [[projects]]
-  digest = "1:aa4d6967a3237f8367b6bf91503964a77183ecf696f1273e8ad3551bb4412b5f"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -298,35 +243,20 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr",
+    "unicode/cldr"
   ]
-  pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  pruneopts = "UT"
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = [
-    "code.cloudfoundry.org/istio-scaling/config",
-    "github.com/cloudfoundry-incubator/cf-test-helpers/cf",
-    "github.com/cloudfoundry-incubator/cf-test-helpers/generator",
-    "github.com/cloudfoundry-incubator/cf-test-helpers/workflowhelpers",
-    "github.com/cloudfoundry/bosh-cli/director",
-    "github.com/cloudfoundry/bosh-cli/uaa",
-    "github.com/cloudfoundry/bosh-utils/logger",
-    "github.com/onsi/ginkgo",
-    "github.com/onsi/ginkgo/ginkgo",
-    "github.com/onsi/gomega",
-    "github.com/onsi/gomega/gexec",
-  ]
+  inputs-digest = "d06d3dade4a94c382b97b36e2648d7f4efefad9b3edbd96dc41da5c058b461df"
   solver-name = "gps-cdcl"
   solver-version = 1
