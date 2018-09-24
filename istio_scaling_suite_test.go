@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"testing"
 	"time"
 
@@ -46,6 +47,7 @@ var (
 	testSetup      *workflowhelpers.ReproducibleTestSuiteSetup
 	defaultTimeout = 90 * time.Second
 	routeTimeout   = 60 * time.Second
+	routesQuota    = -1 // unlimited
 )
 
 var _ = BeforeSuite(func() {
@@ -65,6 +67,11 @@ var _ = BeforeSuite(func() {
 
 	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
 	testSetup.Setup()
+
+	workflowhelpers.AsUser(testSetup.AdminUserContext(), defaultTimeout, func() {
+		_, err := exec.Command("cf", "update-quota", testSetup.TestSpace.QuotaName(), "-r", strconv.Itoa(routesQuota)).CombinedOutput()
+		Expect(err).NotTo(HaveOccurred())
+	})
 
 	By(fmt.Sprintf("pushing %d apps", testPlan.NumApps))
 	push(testPlan.NumApps, testPlan.Concurrency)
