@@ -74,18 +74,40 @@ var _ = BeforeSuite(func() {
 	})
 
 	By(fmt.Sprintf("pushing %d apps", testPlan.NumApps))
-	push(testPlan.NumApps, testPlan.Concurrency)
+	guaranteePush(testPlan)
 })
 
 var _ = AfterSuite(func() {
 	if testPlan.Cleanup && testSetup != nil {
 		workflowhelpers.AsUser(testSetup.AdminUserContext(), defaultTimeout, func() {
-			Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(defaultTimeout)).To(Exit(0))
+			Expect(cf.Cf("delete-org", "-f", testSetup.GetOrganizationName()).Wait(4 * defaultTimeout)).To(Exit(0))
 		})
 
 		testSetup.Teardown()
 	}
 })
+
+func guaranteePush(testPlan config.TestPlan) {
+	push(testPlan.NumApps, testPlan.Concurrency)
+	var started int
+	timeout := time.After(defaultTimeout)
+	try := time.Tick(time.Second * 5)
+
+	for {
+		select {
+		case <-timeout:
+			unPushedApps := testPlan.NumApps - started
+			if unPushedApps != 0 {
+				Expect(push(unPushedApps, testPlan.Concurrency)).To(Succeed())
+			}
+		case <-try:
+			started = len(startedApps(testPlan.NumApps))
+			if started == testPlan.NumApps {
+				return
+			}
+		}
+	}
+}
 
 func push(appNums int, concurrency int) error {
 	sem := make(chan bool, concurrency)
@@ -157,7 +179,7 @@ func appsApi(appNums int) (res []Resource) {
 	if appNums <= maxResultPerPage || pagination != 0 {
 		res = append(res, appsSummary(1, maxResultPerPage)...)
 	}
-	if pagination == 0 {
+	if pagination == 0 && appNums != maxResultPerPage {
 		totalPages := appNums / maxResultPerPage
 		for i := 1; i <= totalPages; i++ {
 			res = append(res, appsSummary(i, maxResultPerPage)...)
@@ -168,6 +190,16 @@ func appsApi(appNums int) (res []Resource) {
 
 func allApps(appNums int) (allApps []Resource) {
 	return appsApi(appNums)
+}
+
+func startedApps(appNums int) (unstarted []Resource) {
+	res := appsApi(appNums)
+	for _, r := range res {
+		if r.Entity.State == "STARTED" {
+			unstarted = append(unstarted, r)
+		}
+	}
+	return unstarted
 }
 
 func unstartedApps(appNums int) (unstarted []Resource) {
