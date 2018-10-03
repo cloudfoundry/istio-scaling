@@ -91,7 +91,6 @@ var _ = Describe("Control Plane Failure", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(err).NotTo(HaveOccurred())
 			Eventually(func() (string, error) {
 				vms, err := deployment.VMInfos()
 				Expect(err).NotTo(HaveOccurred())
