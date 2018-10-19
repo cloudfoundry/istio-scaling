@@ -132,18 +132,21 @@ func push(appNums int, concurrency int) error {
 
 	unstarted := unstartedApps(appNums)
 	if len(unstarted) > 0 {
-		checkApps(unstarted)
+		err := retryApps(unstarted)
+		if err != nil {
+			errs <- err
+			close(errs)
+			return <-errs
+		}
 	}
 
+	// we don't care about push errors unless we weren't able to
+	// successfully restart the unpushed apps
 	close(errs)
-
-	if err := <-errs; err != nil {
-		return err
-	}
 	return nil
 }
 
-func checkApps(unstarted []Resource) error {
+func retryApps(unstarted []Resource) error {
 	// start unstarted apps
 	var delete []string
 	for _, u := range unstarted {
