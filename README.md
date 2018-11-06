@@ -14,7 +14,7 @@ cat << EOF > "${PWD}/config.json"
   "cf_system_domain": "<system-domain>",
   "cf_istio_domain": "istio.<system-domain>",
   "cf_org_name": "some-org",
-  "cf_space_name": "some-space",
+  "cf_space_name": "some-space"
 }
 EOF
 ```
