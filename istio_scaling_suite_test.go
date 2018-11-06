@@ -73,7 +73,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	By(fmt.Sprintf("pushing %d apps", testPlan.NumApps))
+	By(fmt.Sprintf("pushing %d apps", testPlan.NumAppsToPush))
 	guaranteePush(testPlan)
 })
 
@@ -88,7 +88,7 @@ var _ = AfterSuite(func() {
 })
 
 func guaranteePush(testPlan config.TestPlan) {
-	push(testPlan.NumApps, testPlan.Concurrency)
+	pushApps(testPlan)
 	var started int
 	timeout := time.After(defaultTimeout)
 	try := time.Tick(time.Second * 5)
@@ -96,24 +96,24 @@ func guaranteePush(testPlan config.TestPlan) {
 	for {
 		select {
 		case <-timeout:
-			unPushedApps := testPlan.NumApps - started
+			unPushedApps := testPlan.NumAppsToCurl - started
 			if unPushedApps != 0 {
-				Expect(push(unPushedApps, testPlan.Concurrency)).To(Succeed())
+				Expect(pushApps(testPlan)).To(Succeed())
 			}
 		case <-try:
-			started = len(startedApps(testPlan.NumApps))
-			if started == testPlan.NumApps {
+			started = len(startedApps(testPlan.NumAppsToCurl))
+			if started == testPlan.NumAppsToCurl {
 				return
 			}
 		}
 	}
 }
 
-func push(appNums int, concurrency int) error {
-	sem := make(chan bool, concurrency)
-	errs := make(chan error, appNums)
+func pushApps(testPlan config.TestPlan) error {
+	sem := make(chan bool, testPlan.Concurrency)
+	errs := make(chan error, testPlan.NumAppsToPush)
 
-	for i := 0; i < appNums; i++ {
+	for i := 0; i < testPlan.NumAppsToPush; i++ {
 		sem <- true
 		appName := generator.PrefixedRandomName("SCALING", "APP")
 		go func() {
@@ -130,7 +130,7 @@ func push(appNums int, concurrency int) error {
 		sem <- true
 	}
 
-	unstarted := unstartedApps(appNums)
+	unstarted := unstartedApps(testPlan.NumAppsToCurl)
 	if len(unstarted) > 0 {
 		err := retryApps(unstarted)
 		if err != nil {

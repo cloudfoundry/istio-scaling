@@ -9,10 +9,11 @@ import (
 )
 
 type TestPlan struct {
-	NumApps      int  `json:"number_of_apps"`
-	AppInstances int  `json:"app_instances"`
-	Concurrency  int  `json:"app_push_concurrency"`
-	Cleanup      bool `json:"cleanup"`
+	NumAppsToPush int  `json:"number_of_apps_to_push"`
+	NumAppsToCurl int  `json:"number_of_apps_to_curl"`
+	AppInstances  int  `json:"app_instances"`
+	Concurrency   int  `json:"app_push_concurrency"`
+	Cleanup       bool `json:"cleanup"`
 }
 
 func NewPlan(path string) (TestPlan, error) {
@@ -31,8 +32,14 @@ func NewPlan(path string) (TestPlan, error) {
 
 func (c *TestPlan) Validate() error {
 	missingProperties := []string{}
-	if c.NumApps == 0 {
+	if c.NumAppsToPush == 0 {
 		missingProperties = append(missingProperties, "number_of_apps")
+	}
+	if c.NumAppsToCurl == 0 {
+		c.NumAppsToCurl = c.NumAppsToPush
+	}
+	if c.NumAppsToCurl < c.NumAppsToPush {
+		return errors.New(("number_of_apps_to_curl must be >= number_of_apps_to_push"))
 	}
 	if c.AppInstances == 0 {
 		missingProperties = append(missingProperties, "app_instances")

@@ -105,7 +105,7 @@ var _ = Describe("Control Plane Failure", func() {
 			}, 10*time.Minute, "1m").Should(Equal("stopped"))
 
 			By("mapping a new route")
-			apps := allApps(testPlan.NumApps)
+			apps := allApps(testPlan.NumAppsToPush)
 			app := apps[0].Entity.AppName
 
 			cf.Cf("map-route", app, cfg.IstioDomain, "--hostname", hostname)

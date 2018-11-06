@@ -14,7 +14,7 @@ var appDropletPath = "assets/hello-golang.tgz"
 var _ = Describe("Istio scaling", func() {
 	Context("when pushing multiple apps", func() {
 		It("checks responses", func() {
-			apps := allApps(testPlan.NumApps)
+			apps := allApps(testPlan.NumAppsToCurl)
 			for i, app := range apps {
 				appURL := fmt.Sprintf("http://%s.%s", app.Entity.AppName, cfg.IstioDomain)
 				By(fmt.Sprintf("%d -- send request to app %s", i, appURL))

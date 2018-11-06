@@ -14,6 +14,8 @@ type Config struct {
 	IstioDomain    string `json:"cf_istio_domain"`
 	AdminUser      string `json:"cf_admin_user"`
 	AdminPassword  string `json:"cf_admin_password"`
+	OrgName        string `json:"cf_org_name"`
+	SpaceName      string `json:"cf_space_name"`
 }
 
 func NewConfig(path string) (Config, error) {
@@ -71,9 +73,29 @@ func (c Config) GetExistingUser() string                        { return "" }
 func (c Config) GetExistingUserPassword() string                { return "" }
 func (c Config) GetShouldKeepUser() bool                        { return false }
 func (c Config) GetUseExistingUser() bool                       { return false }
-func (c Config) GetUseExistingOrganization() bool               { return false }
-func (c Config) GetUseExistingSpace() bool                      { return false }
-func (c Config) GetExistingOrganization() string                { return "" }
-func (c Config) GetExistingSpace() string                       { return "" }
+func (c Config) GetExistingOrganization() string                { return c.OrgName }
+func (c Config) GetExistingSpace() string                       { return c.SpaceName }
+func (c Config) GetExistingQuota() string                       { return c.QuotaName }
 func (c Config) GetSkipSSLValidation() bool                     { return true }
 func (c Config) GetNamePrefix() string                          { return "SCALING" }
+
+func (c Config) GetUseExistingOrganization() bool {
+	if c.OrgName != "" {
+		return true
+	}
+	return false
+}
+
+func (c Config) GetUseExistingSpace() bool {
+	if c.SpaceName != "" {
+		return true
+	}
+	return false
+}
+
+func (c Config) GetUseExistingQuota() bool {
+	if c.QuotaName != "" {
+		return true
+	}
+	return false
+}
