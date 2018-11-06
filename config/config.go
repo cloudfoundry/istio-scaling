@@ -75,7 +75,6 @@ func (c Config) GetShouldKeepUser() bool                        { return false }
 func (c Config) GetUseExistingUser() bool                       { return false }
 func (c Config) GetExistingOrganization() string                { return c.OrgName }
 func (c Config) GetExistingSpace() string                       { return c.SpaceName }
-func (c Config) GetExistingQuota() string                       { return c.QuotaName }
 func (c Config) GetSkipSSLValidation() bool                     { return true }
 func (c Config) GetNamePrefix() string                          { return "SCALING" }
 
@@ -88,13 +87,6 @@ func (c Config) GetUseExistingOrganization() bool {
 
 func (c Config) GetUseExistingSpace() bool {
 	if c.SpaceName != "" {
-		return true
-	}
-	return false
-}
-
-func (c Config) GetUseExistingQuota() bool {
-	if c.QuotaName != "" {
 		return true
 	}
 	return false
