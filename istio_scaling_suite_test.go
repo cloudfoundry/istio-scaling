@@ -246,6 +246,7 @@ func pushApp(appName string) error {
 	fmt.Printf("pushing: %s \n", appName)
 	bytes, err := exec.Command("cf",
 		"push", appName,
+		"-s", "cflinuxfs3",
 		"-d", cfg.IstioDomain,
 		"--droplet", appDropletPath,
 		"-i", fmt.Sprintf("\"%d\"", testPlan.AppInstances),
