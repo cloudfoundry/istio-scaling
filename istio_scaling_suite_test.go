@@ -68,6 +68,7 @@ var _ = BeforeSuite(func() {
 	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
 	testSetup.Setup()
 
+	fmt.Printf("testSpace: %+v\nQuotaName: %+v\n", testSetup.TestSpace, testSetup.TestSpace.QuotaName())
 	workflowhelpers.AsUser(testSetup.AdminUserContext(), defaultTimeout, func() {
 		_, err := exec.Command("cf", "update-quota", testSetup.TestSpace.QuotaName(), "-r", strconv.Itoa(routesQuota)).CombinedOutput()
 		Expect(err).NotTo(HaveOccurred())
@@ -88,17 +89,18 @@ var _ = AfterSuite(func() {
 })
 
 func guaranteePush(testPlan config.TestPlan) {
-	pushApps(testPlan)
+	pushApps(testPlan.NumAppsToPush, testPlan.NumAppsToCurl, testPlan.Concurrency)
 	var started int
+	// TODO: should this really be a 90s timeout?
 	timeout := time.After(defaultTimeout)
-	try := time.Tick(time.Second * 5)
+	try := time.Tick(time.Second * 10)
 
 	for {
 		select {
 		case <-timeout:
 			unPushedApps := testPlan.NumAppsToCurl - started
 			if unPushedApps != 0 {
-				Expect(pushApps(testPlan)).To(Succeed())
+				Expect(pushApps(unPushedApps, testPlan.NumAppsToCurl, testPlan.Concurrency)).To(Succeed())
 			}
 		case <-try:
 			started = len(startedApps(testPlan.NumAppsToCurl))
@@ -109,11 +111,11 @@ func guaranteePush(testPlan config.TestPlan) {
 	}
 }
 
-func pushApps(testPlan config.TestPlan) error {
-	sem := make(chan bool, testPlan.Concurrency)
-	errs := make(chan error, testPlan.NumAppsToPush)
+func pushApps(numAppsToPush, totalApps, concurrency int) error {
+	sem := make(chan bool, concurrency)
+	errs := make(chan error, numAppsToPush)
 
-	for i := 0; i < testPlan.NumAppsToPush; i++ {
+	for i := 0; i < numAppsToPush; i++ {
 		sem <- true
 		appName := generator.PrefixedRandomName("SCALING", "APP")
 		go func() {
@@ -130,7 +132,7 @@ func pushApps(testPlan config.TestPlan) error {
 		sem <- true
 	}
 
-	unstarted := unstartedApps(testPlan.NumAppsToCurl)
+	unstarted := unstartedApps(totalApps)
 	if len(unstarted) > 0 {
 		err := retryApps(unstarted)
 		if err != nil {
@@ -174,39 +176,35 @@ func retryApps(unstarted []Resource) error {
 	return nil
 }
 
-func appsApi(appNums int) (res []Resource) {
+func allApps(appNums int) (resources []Resource) {
 	// This is due to https://github.com/cloudfoundry/capi-release/blob/0439fe2157747a7698a5ae09a1f01e034fcaaf9e/jobs/cloud_controller_ng/spec#L708
 	maxResultPerPage := 100
 
 	pagination := appNums % maxResultPerPage
 	if appNums <= maxResultPerPage || pagination != 0 {
-		res = append(res, appsSummary(1, maxResultPerPage)...)
+		resources = append(resources, appsSummary(1, maxResultPerPage)...)
 	}
 	if pagination == 0 && appNums != maxResultPerPage {
 		totalPages := appNums / maxResultPerPage
 		for i := 1; i <= totalPages; i++ {
-			res = append(res, appsSummary(i, maxResultPerPage)...)
+			resources = append(resources, appsSummary(i, maxResultPerPage)...)
 		}
 	}
-	return res
+	return resources
 }
 
-func allApps(appNums int) (allApps []Resource) {
-	return appsApi(appNums)
-}
-
-func startedApps(appNums int) (unstarted []Resource) {
-	res := appsApi(appNums)
+func startedApps(appNums int) (started []Resource) {
+	res := allApps(appNums)
 	for _, r := range res {
 		if r.Entity.State == "STARTED" {
-			unstarted = append(unstarted, r)
+			started = append(started, r)
 		}
 	}
-	return unstarted
+	return started
 }
 
 func unstartedApps(appNums int) (unstarted []Resource) {
-	res := appsApi(appNums)
+	res := allApps(appNums)
 	for _, r := range res {
 		if r.Entity.State != "STARTED" {
 			unstarted = append(unstarted, r)

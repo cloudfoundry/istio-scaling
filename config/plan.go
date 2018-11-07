@@ -33,7 +33,7 @@ func NewPlan(path string) (TestPlan, error) {
 func (c *TestPlan) Validate() error {
 	missingProperties := []string{}
 	if c.NumAppsToPush == 0 {
-		missingProperties = append(missingProperties, "number_of_apps")
+		missingProperties = append(missingProperties, "number_of_apps_to_push")
 	}
 	if c.NumAppsToCurl == 0 {
 		c.NumAppsToCurl = c.NumAppsToPush
@@ -48,7 +48,7 @@ func (c *TestPlan) Validate() error {
 		c.Concurrency = 16
 	}
 	if len(missingProperties) > 0 {
-		return errors.New(fmt.Sprintf("Missing required config properties: %s", strings.Join(missingProperties, ", ")))
+		return fmt.Errorf("Missing required config properties: %s", strings.Join(missingProperties, ", "))
 	}
 	return nil
 }
