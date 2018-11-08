@@ -59,6 +59,13 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(cfg.Validate()).To(Succeed())
 
+	// change the default quota insteaad of creating a new one
+	Expect(cf.Cf("update-quota", "default", "-r", strconv.Itoa(routesQuota)).Wait(4 * defaultTimeout)).To(Exit(0))
+	Expect(cf.Cf("create-org", cfg.OrgName).Wait(4 * defaultTimeout)).To(Exit(0))
+	Expect(cf.Cf("target", "-o", cfg.OrgName).Wait(4 * defaultTimeout)).To(Exit(0))
+	Expect(cf.Cf("create-space", cfg.SpaceName).Wait(4 * defaultTimeout)).To(Exit(0))
+	Expect(cf.Cf("target", "-o", cfg.OrgName, "-s", cfg.SpaceName).Wait(4 * defaultTimeout)).To(Exit(0))
+
 	planPath := os.Getenv("PLAN")
 	Expect(planPath).NotTo(BeEmpty())
 	testPlan, err = config.NewPlan(planPath)
@@ -67,12 +74,6 @@ var _ = BeforeSuite(func() {
 
 	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
 	testSetup.Setup()
-
-	fmt.Printf("testSpace: %+v\nQuotaName: %+v\n", testSetup.TestSpace, testSetup.TestSpace.QuotaName())
-	workflowhelpers.AsUser(testSetup.AdminUserContext(), defaultTimeout, func() {
-		_, err := exec.Command("cf", "update-quota", testSetup.TestSpace.QuotaName(), "-r", strconv.Itoa(routesQuota)).CombinedOutput()
-		Expect(err).NotTo(HaveOccurred())
-	})
 
 	By(fmt.Sprintf("pushing %d apps", testPlan.NumAppsToPush))
 	guaranteePush(testPlan)
