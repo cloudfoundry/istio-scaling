@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"testing"
 	"time"
 
@@ -59,21 +58,20 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(cfg.Validate()).To(Succeed())
 
-	// change the default quota insteaad of creating a new one
-	Expect(cf.Cf("update-quota", "default", "-r", strconv.Itoa(routesQuota)).Wait(4 * defaultTimeout)).To(Exit(0))
-	Expect(cf.Cf("create-org", cfg.OrgName).Wait(4 * defaultTimeout)).To(Exit(0))
-	Expect(cf.Cf("target", "-o", cfg.OrgName).Wait(4 * defaultTimeout)).To(Exit(0))
-	Expect(cf.Cf("create-space", cfg.SpaceName).Wait(4 * defaultTimeout)).To(Exit(0))
-	Expect(cf.Cf("target", "-o", cfg.OrgName, "-s", cfg.SpaceName).Wait(4 * defaultTimeout)).To(Exit(0))
+	testSpace := config.NewSpace(cfg)
+	testUser := config.NewUser(cfg)
+	adminUser := config.NewAdmin(cfg)
+	regularUserCtx := workflowhelpers.NewUserContext(cfg.GetApiEndpoint(), testUser, testSpace, cfg.GetSkipSSLValidation(), defaultTimeout)
+	adminUserCtx := workflowhelpers.NewUserContext(cfg.GetApiEndpoint(), adminUser, nil, cfg.GetSkipSSLValidation(), defaultTimeout)
+	skipUserCreation := cfg.GetUseExistingUser()
+	testSetup = workflowhelpers.NewBaseTestSuiteSetup(cfg, testSpace, testUser, regularUserCtx, adminUserCtx, skipUserCreation)
+	testSetup.Setup()
 
 	planPath := os.Getenv("PLAN")
 	Expect(planPath).NotTo(BeEmpty())
 	testPlan, err = config.NewPlan(planPath)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(testPlan.Validate()).To(Succeed())
-
-	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
-	testSetup.Setup()
 
 	By(fmt.Sprintf("pushing %d apps", testPlan.NumAppsToPush))
 	guaranteePush(testPlan)
@@ -91,28 +89,42 @@ var _ = AfterSuite(func() {
 
 func guaranteePush(testPlan config.TestPlan) {
 	pushApps(testPlan.NumAppsToPush, testPlan.NumAppsToCurl, testPlan.Concurrency)
-	var started int
-	// TODO: should this really be a 90s timeout?
-	timeout := time.After(defaultTimeout)
 	try := time.Tick(time.Second * 10)
+	runningApps := make(chan int)
+	quit := make(chan struct{})
 
-	for {
-		select {
-		case <-timeout:
-			unPushedApps := testPlan.NumAppsToCurl - started
-			if unPushedApps != 0 {
-				Expect(pushApps(unPushedApps, testPlan.NumAppsToCurl, testPlan.Concurrency)).To(Succeed())
-			}
-		case <-try:
-			started = len(startedApps(testPlan.NumAppsToCurl))
-			if started == testPlan.NumAppsToCurl {
+	go func() {
+		for {
+			select {
+			case started := <-runningApps:
+				if started >= testPlan.NumAppsToCurl {
+					return
+				}
+				unPushedApps := testPlan.NumAppsToCurl - started
+				if unPushedApps != 0 {
+					Expect(pushApps(unPushedApps, testPlan.NumAppsToCurl, testPlan.Concurrency)).To(Succeed())
+				}
+			case <-quit:
 				return
 			}
 		}
+	}()
+
+	for range try {
+		started := len(startedApps(testPlan.NumAppsToCurl))
+		if started >= testPlan.NumAppsToCurl {
+			quit <- struct{}{}
+			return
+		}
+		runningApps <- started
 	}
 }
 
 func pushApps(numAppsToPush, totalApps, concurrency int) error {
+	started := len(startedApps(testPlan.NumAppsToCurl))
+	if started >= totalApps {
+		return nil
+	}
 	sem := make(chan bool, concurrency)
 	errs := make(chan error, numAppsToPush)
 
@@ -182,10 +194,16 @@ func allApps(appNums int) (resources []Resource) {
 	maxResultPerPage := 100
 
 	pagination := appNums % maxResultPerPage
-	if appNums <= maxResultPerPage || pagination != 0 {
+	if appNums <= maxResultPerPage && pagination != 0 {
 		resources = append(resources, appsSummary(1, maxResultPerPage)...)
 	}
-	if pagination == 0 && appNums != maxResultPerPage {
+	if pagination != 0 && appNums > maxResultPerPage {
+		totalPages := appNums / maxResultPerPage
+		for i := 1; i <= totalPages+1; i++ {
+			resources = append(resources, appsSummary(i, maxResultPerPage)...)
+		}
+	}
+	if pagination == 0 && appNums > maxResultPerPage {
 		totalPages := appNums / maxResultPerPage
 		for i := 1; i <= totalPages; i++ {
 			resources = append(resources, appsSummary(i, maxResultPerPage)...)

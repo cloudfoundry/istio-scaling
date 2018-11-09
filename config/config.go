@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var defaultTimeout = 90 * time.Second
+
 type Config struct {
 	CFSystemDomain string `json:"cf_system_domain"`
 	IstioDomain    string `json:"cf_istio_domain"`
