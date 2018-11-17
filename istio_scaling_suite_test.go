@@ -89,7 +89,7 @@ var _ = AfterSuite(func() {
 
 func guaranteePush(testPlan config.TestPlan) {
 	pushApps(testPlan.NumAppsToPush, testPlan.NumAppsToCurl, testPlan.Concurrency)
-	try := time.Tick(time.Second * 10)
+	try := time.Tick(2 * defaultTimeout)
 	runningApps := make(chan int)
 	quit := make(chan struct{})
 
@@ -102,6 +102,7 @@ func guaranteePush(testPlan config.TestPlan) {
 				}
 				unPushedApps := testPlan.NumAppsToCurl - started
 				if unPushedApps != 0 {
+					fmt.Printf("Started %d apps so far, pushing %d more apps...\n", started, unPushedApps)
 					Expect(pushApps(unPushedApps, testPlan.NumAppsToCurl, testPlan.Concurrency)).To(Succeed())
 				}
 			case <-quit:
