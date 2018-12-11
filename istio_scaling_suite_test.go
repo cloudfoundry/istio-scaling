@@ -267,7 +267,7 @@ func pushApp(appName string) error {
 		"-s", "cflinuxfs3",
 		"-d", cfg.IstioDomain,
 		"--droplet", appDropletPath,
-		"-i", fmt.Sprintf("\"%d\"", testPlan.AppInstances),
+		"-i", fmt.Sprintf("%d", testPlan.AppInstances),
 		"-m", "16M",
 		"-k", "75M").CombinedOutput()
 	fmt.Printf("output: %s\n", string(bytes))
