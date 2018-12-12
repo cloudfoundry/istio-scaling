@@ -48,3 +48,7 @@ CONFIG="$PWD/config.json" PLAN="$PWD/plan.json" scripts/test
 ```sh
 You can run CATS after running scalling tests as you would usually, however be sure to the set the flag cleanup in the plan file to false and manually delete your org.
 ```
+
+## Assets
+- `closer-golang.tgz`: This app closes connections which results in a 503 on curl.
+- `hello-golang.tgz`: This app responds with 'hello' on curl.
