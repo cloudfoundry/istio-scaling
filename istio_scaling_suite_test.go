@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 	"time"
 
@@ -234,8 +235,12 @@ func unstartedApps(appNums int) (unstarted []Resource) {
 }
 
 func appsSummary(page int, resultPerPage int) []Resource {
-	fmt.Printf("calling apps api : cf curl \"/v2/apps?results-per-page=%d&page=%d\"\n", resultPerPage, page)
-	bytes, err := exec.Command("cf", "curl", fmt.Sprintf("/v2/apps?results-per-page=%d&page=%d", resultPerPage, page)).CombinedOutput()
+	orgGuid := cf.Cf("org", cfg.OrgName, "--guid").Wait(defaultTimeout).Out.Contents()
+	spaceGuid := cf.Cf("space", cfg.SpaceName, "--guid").Wait(defaultTimeout).Out.Contents()
+
+	url := fmt.Sprintf("/v2/apps?q=organization_guid:%s&q=space_guid:%s&results-per-page=%d&page=%d", strings.TrimSpace(string(orgGuid)), strings.TrimSpace(string(spaceGuid)), resultPerPage, page)
+	fmt.Printf("calling apps api : cf curl \"%s\"\n", url)
+	bytes, err := exec.Command("cf", "curl", url).CombinedOutput()
 	if err != nil {
 		Expect(err).ToNot(HaveOccurred())
 	}
