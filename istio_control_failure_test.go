@@ -13,7 +13,6 @@ import (
 	boshdir "github.com/cloudfoundry/bosh-cli/director"
 	boshuaa "github.com/cloudfoundry/bosh-cli/uaa"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -18,6 +18,7 @@ type Config struct {
 	AdminPassword  string `json:"cf_admin_password"`
 	OrgName        string `json:"cf_org_name"`
 	SpaceName      string `json:"cf_space_name"`
+	DatadogApiKey  string `json:"datadog_api_key"`
 }
 
 func NewConfig(path string) (Config, error) {
@@ -47,6 +48,9 @@ func (c Config) Validate() error {
 	}
 	if c.AdminPassword == "" {
 		missingProperties = append(missingProperties, "cf_admin_password")
+	}
+	if c.DatadogApiKey == "" {
+		missingProperties = append(missingProperties, "datadog_api_key")
 	}
 	if len(missingProperties) > 0 {
 		return errors.New(fmt.Sprintf("Missing required config properties: %s", strings.Join(missingProperties, ", ")))
