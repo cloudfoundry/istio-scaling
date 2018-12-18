@@ -196,7 +196,7 @@ func allApps(appNums int) (resources []Resource) {
 	maxResultPerPage := 100
 
 	pagination := appNums % maxResultPerPage
-	if appNums <= maxResultPerPage && pagination != 0 {
+	if appNums <= maxResultPerPage {
 		resources = append(resources, appsSummary(1, maxResultPerPage)...)
 	}
 	if pagination != 0 && appNums > maxResultPerPage {
