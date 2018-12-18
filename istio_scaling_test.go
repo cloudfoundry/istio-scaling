@@ -37,27 +37,29 @@ var _ = Describe("Istio scaling", func() {
 			fmt.Println("RESULTS:")
 			fmt.Printf("  %d out of %d curls successful\n", appsUpCount, testPlan.NumAppsToCurl)
 
-			environment := getValidDatadogName(strings.Split(cfg.CFSystemDomain, ".")[0])
-			metric := fmt.Sprintf("%s.scale.AppsUp", environment)
+			if cfg.DatadogApiKey != "" {
+				environment := getValidDatadogName(strings.Split(cfg.CFSystemDomain, ".")[0])
+				metric := fmt.Sprintf("%s.scale.AppsUp", environment)
 
-			data := fmt.Sprintf(`{ "series" :
+				data := fmt.Sprintf(`{ "series" :
 			           [{"metric":"%s",
 			            "points":[[$(date +%%s), %d]],
 			            "type":"gauge",
 			            "tags":["deployment:%s"]
 			          }]
 			        }`, metric, appsUpCount, cfg.CFSystemDomain)
-			b, err := exec.Command("curl",
-				"-f",
-				"-X", "POST",
-				"-H", "Content-type: application/json",
-				"-d", data,
-				fmt.Sprintf("https://app.datadoghq.com/api/v1/series?api_key=%s", cfg.DatadogApiKey)).CombinedOutput()
-			if err != nil {
-				Expect(err).ToNot(HaveOccurred())
+				b, err := exec.Command("curl",
+					"-f",
+					"-X", "POST",
+					"-H", "Content-type: application/json",
+					"-d", data,
+					fmt.Sprintf("https://app.datadoghq.com/api/v1/series?api_key=%s", cfg.DatadogApiKey)).CombinedOutput()
+				if err != nil {
+					Expect(err).ToNot(HaveOccurred())
+				}
+				Expect(bytes.Contains(b, []byte(`{"status": "ok"}`))).Should(BeTrue())
+				fmt.Printf("Metric %s sent successfully\n", metric)
 			}
-			Expect(bytes.Contains(b, []byte(`{"status": "ok"}`))).Should(BeTrue())
-			fmt.Printf("Metric %s sent successfully\n", metric)
 		})
 	})
 })

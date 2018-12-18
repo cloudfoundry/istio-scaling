@@ -49,9 +49,6 @@ func (c Config) Validate() error {
 	if c.AdminPassword == "" {
 		missingProperties = append(missingProperties, "cf_admin_password")
 	}
-	if c.DatadogApiKey == "" {
-		missingProperties = append(missingProperties, "datadog_api_key")
-	}
 	if len(missingProperties) > 0 {
 		return errors.New(fmt.Sprintf("Missing required config properties: %s", strings.Join(missingProperties, ", ")))
 	}
