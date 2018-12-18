@@ -9,11 +9,12 @@ import (
 )
 
 type TestPlan struct {
-	NumAppsToPush int  `json:"number_of_apps_to_push"`
-	NumAppsToCurl int  `json:"number_of_apps_to_curl"`
-	AppInstances  int  `json:"app_instances"`
-	Concurrency   int  `json:"app_push_concurrency"`
-	Cleanup       bool `json:"cleanup"`
+	NumAppsToPush int    `json:"number_of_apps_to_push"`
+	NumAppsToCurl int    `json:"number_of_apps_to_curl"`
+	AppMemSize    string `json:"app_mem_size" default:"16M"`
+	AppInstances  int    `json:"app_instances"`
+	Concurrency   int    `json:"app_push_concurrency"`
+	Cleanup       bool   `json:"cleanup"`
 }
 
 func NewPlan(path string) (TestPlan, error) {

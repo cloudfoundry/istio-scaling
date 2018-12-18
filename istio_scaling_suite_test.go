@@ -273,7 +273,7 @@ func pushApp(appName string) error {
 		"-d", cfg.IstioDomain,
 		"--droplet", appDropletPath,
 		"-i", fmt.Sprintf("%d", testPlan.AppInstances),
-		"-m", "16M",
+		"-m", testPlan.AppMemSize,
 		"-k", "75M").CombinedOutput()
 	fmt.Printf("output: %s\n", string(bytes))
 	return err

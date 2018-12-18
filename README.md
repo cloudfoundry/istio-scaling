@@ -28,6 +28,7 @@ cat << EOF > "${PWD}/plan.json"
   "number_of_apps_to_push": 10,
   "number_of_apps_to_curl": 10,
   "app_instances": 1,
+  "app_mem_size": "16M",
   "cleanup": false
 }
 EOF
