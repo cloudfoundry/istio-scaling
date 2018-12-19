@@ -90,7 +90,8 @@ var _ = AfterSuite(func() {
 
 func guaranteePush(testPlan config.TestPlan) {
 	pushApps(testPlan.NumAppsToPush, testPlan.NumAppsToCurl, testPlan.Concurrency)
-	try := time.Tick(2 * defaultTimeout)
+	tryTick := time.Tick(defaultTimeout)
+	tries := 1
 	runningApps := make(chan int)
 	quit := make(chan struct{})
 
@@ -112,13 +113,18 @@ func guaranteePush(testPlan config.TestPlan) {
 		}
 	}()
 
-	for range try {
+	for range tryTick {
 		started := len(startedApps(testPlan.NumAppsToCurl))
 		if started >= testPlan.NumAppsToCurl {
 			quit <- struct{}{}
 			return
 		}
+		tries += 1
 		runningApps <- started
+		if tries > 2 {
+			quit <- struct{}{}
+			return
+		}
 	}
 }
 
