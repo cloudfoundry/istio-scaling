@@ -1,17 +1,52 @@
 package scaling_test
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
-	"os/exec"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var appDropletPath = "assets/hello-golang.tgz"
+
+func buildDatadogResponse(number int, metric string, int timestamp) string {
+	return fmt.Sprintf(`
+	{
+		"series" :
+			[{
+				"metric":"scaling_test.wip.%s",
+			  "points":[[%d, %d]],
+			  "type":"count",
+			  "tags":["deployment:%s"]
+			}]
+	}`,
+		metric,
+		timestamp,
+		number,
+		cfg.CFSystemDomain,
+	)
+}
+
+func sendResultToDatadog(numberSuccessfulCurls int, totalCurls int) {
+	environment := getValidDatadogName(strings.Split(cfg.CFSystemDomain, ".")[0])
+	timestamp := time.Now()
+
+	successData := buildDatadogResponse(numberSuccessfulCurls, "success", timestamp)
+	totalData := buildDatadogResponse(totalCurls, "total", timestamp)
+
+	url := fmt.Sprintf("https://app.datadoghq.com/api/v1/series?api_key=%s", cfg.DatadogApiKey)
+	client := http.DefaultClient()
+
+	resp, err := client.Post(url, "application/json", strings.NewReader(successData))
+	Expect(err).NotTo(HaveOccurred())
+
+	resp, err := client.Post(url, "application/json", strings.NewReader(totalData))
+	Expect(err).NotTo(HaveOccurred())
+
+}
 
 var _ = Describe("Istio scaling", func() {
 	Context("when pushing multiple apps", func() {
@@ -38,27 +73,7 @@ var _ = Describe("Istio scaling", func() {
 			fmt.Printf("  %d out of %d curls successful\n", appsUpCount, testPlan.NumAppsToCurl)
 
 			if cfg.DatadogApiKey != "" {
-				environment := getValidDatadogName(strings.Split(cfg.CFSystemDomain, ".")[0])
-				metric := fmt.Sprintf("%s.scale.AppsUp", environment)
-
-				data := fmt.Sprintf(`{ "series" :
-			           [{"metric":"%s",
-			            "points":[[$(date +%%s), %d]],
-			            "type":"gauge",
-			            "tags":["deployment:%s"]
-			          }]
-			        }`, metric, appsUpCount, cfg.CFSystemDomain)
-				b, err := exec.Command("curl",
-					"-f",
-					"-X", "POST",
-					"-H", "Content-type: application/json",
-					"-d", data,
-					fmt.Sprintf("https://app.datadoghq.com/api/v1/series?api_key=%s", cfg.DatadogApiKey)).CombinedOutput()
-				if err != nil {
-					Expect(err).ToNot(HaveOccurred())
-				}
-				Expect(bytes.Contains(b, []byte(`{"status": "ok"}`))).Should(BeTrue())
-				fmt.Printf("Metric %s sent successfully\n", metric)
+				sendResultToDatadog(appsUpCount, testPlan.NumAppsToCurl)
 			}
 		})
 	})
