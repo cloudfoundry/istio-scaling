@@ -12,40 +12,40 @@ import (
 
 var appDropletPath = "assets/hello-golang.tgz"
 
-func buildDatadogResponse(number int, metric string, int timestamp) string {
+func buildDatadogResponse(number int, metric string, timestamp time.Time) string {
+	environmentName := getValidDatadogName(strings.Split(cfg.CFSystemDomain, ".")[0])
 	return fmt.Sprintf(`
 	{
 		"series" :
 			[{
-				"metric":"scaling_test.wip.%s",
+			  "metric":"istio_scaling_test.%s",
 			  "points":[[%d, %d]],
 			  "type":"count",
 			  "tags":["deployment:%s"]
 			}]
 	}`,
 		metric,
-		timestamp,
+		timestamp.Unix(),
 		number,
-		cfg.CFSystemDomain,
+		environmentName,
 	)
 }
 
 func sendResultToDatadog(numberSuccessfulCurls int, totalCurls int) {
-	environment := getValidDatadogName(strings.Split(cfg.CFSystemDomain, ".")[0])
 	timestamp := time.Now()
 
 	successData := buildDatadogResponse(numberSuccessfulCurls, "success", timestamp)
 	totalData := buildDatadogResponse(totalCurls, "total", timestamp)
 
 	url := fmt.Sprintf("https://app.datadoghq.com/api/v1/series?api_key=%s", cfg.DatadogApiKey)
-	client := http.DefaultClient()
+	client := http.DefaultClient
 
-	resp, err := client.Post(url, "application/json", strings.NewReader(successData))
+	_, err := client.Post(url, "application/json", strings.NewReader(successData))
 	Expect(err).NotTo(HaveOccurred())
 
-	resp, err := client.Post(url, "application/json", strings.NewReader(totalData))
+	_, err = client.Post(url, "application/json", strings.NewReader(totalData))
 	Expect(err).NotTo(HaveOccurred())
-
+	fmt.Println("Results sent to datadog!")
 }
 
 var _ = Describe("Istio scaling", func() {
@@ -73,6 +73,7 @@ var _ = Describe("Istio scaling", func() {
 			fmt.Printf("  %d out of %d curls successful\n", appsUpCount, testPlan.NumAppsToCurl)
 
 			if cfg.DatadogApiKey != "" {
+				fmt.Println("Sending results to datadog")
 				sendResultToDatadog(appsUpCount, testPlan.NumAppsToCurl)
 			}
 		})
