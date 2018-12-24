@@ -13,6 +13,7 @@ cat << EOF > "${PWD}/config.json"
   "cf_admin_password": "<admin password>",
   "cf_system_domain": "<system-domain>",
   "cf_istio_domain": "istio.<system-domain>",
+  "datadog_api_key": "<key>",
   "cf_org_name": "some-org",
   "cf_space_name": "some-space"
 }
@@ -21,13 +22,16 @@ EOF
 `cf_org_name` and `cf_space_name` are optional. If they are not provided, a
 random name will be created.
 
+`datadog_api_key` is also optional. If provided, the metrics will be emitted to
+datadog.
+
 # Create a plan file
 ```sh
 cat << EOF > "${PWD}/plan.json"
 {
   "number_of_apps_to_push": 10,
   "number_of_apps_to_curl": 10,
-  "passing_threshold": 99.9,
+  "passing_threshold": 90,
   "app_instances": 1,
   "app_mem_size": "16M",
   "cleanup": false
