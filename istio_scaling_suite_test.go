@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 	"testing"
 	"time"
 
@@ -59,20 +58,30 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(cfg.Validate()).To(Succeed())
 
-	testSpace := config.NewSpace(cfg)
-	testUser := config.NewUser(cfg)
-	adminUser := config.NewAdmin(cfg)
-	regularUserCtx := workflowhelpers.NewUserContext(cfg.GetApiEndpoint(), testUser, testSpace, cfg.GetSkipSSLValidation(), defaultTimeout)
-	adminUserCtx := workflowhelpers.NewUserContext(cfg.GetApiEndpoint(), adminUser, nil, cfg.GetSkipSSLValidation(), defaultTimeout)
-	skipUserCreation := cfg.GetUseExistingUser()
-	testSetup = workflowhelpers.NewBaseTestSuiteSetup(cfg, testSpace, testUser, regularUserCtx, adminUserCtx, skipUserCreation)
-	testSetup.Setup()
+	// change the default quota insteaad of creating a new one
+	// Expect(cf.Cf("update-quota", "default", "-r", strconv.Itoa(routesQuota)).Wait(4 * defaultTimeout)).To(Exit(0))
+	// Expect(cf.Cf("create-org", cfg.OrgName).Wait(4 * defaultTimeout)).To(Exit(0))
+	// Expect(cf.Cf("target", "-o", cfg.OrgName).Wait(4 * defaultTimeout)).To(Exit(0))
+	// Expect(cf.Cf("create-space", cfg.SpaceName).Wait(4 * defaultTimeout)).To(Exit(0))
+	// Expect(cf.Cf("target", "-o", cfg.OrgName, "-s", cfg.SpaceName).Wait(4 * defaultTimeout)).To(Exit(0))
+
+	// 	testSpace := config.NewSpace(cfg)
+	// 	testUser := config.NewUser(cfg)
+	// 	adminUser := config.NewAdmin(cfg)
+	// 	regularUserCtx := workflowhelpers.NewUserContext(cfg.GetApiEndpoint(), testUser, testSpace, cfg.GetSkipSSLValidation(), defaultTimeout)
+	// 	adminUserCtx := workflowhelpers.NewUserContext(cfg.GetApiEndpoint(), adminUser, nil, cfg.GetSkipSSLValidation(), defaultTimeout)
+	// 	skipUserCreation := cfg.GetUseExistingUser()
+	// 	testSetup = workflowhelpers.NewBaseTestSuiteSetup(cfg, testSpace, testUser, regularUserCtx, adminUserCtx, skipUserCreation)
+	// 	testSetup.Setup()
 
 	planPath := os.Getenv("PLAN")
 	Expect(planPath).NotTo(BeEmpty())
 	testPlan, err = config.NewPlan(planPath)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(testPlan.Validate()).To(Succeed())
+
+	testSetup = workflowhelpers.NewRunawayAppTestSuiteSetup(cfg)
+	testSetup.Setup()
 
 	By(fmt.Sprintf("pushing %d apps", testPlan.NumAppsToPush))
 	guaranteePush(testPlan)
@@ -241,12 +250,14 @@ func unstartedApps(appNums int) (unstarted []Resource) {
 }
 
 func appsSummary(page int, resultPerPage int) []Resource {
-	orgGuid := cf.Cf("org", cfg.OrgName, "--guid").Wait(defaultTimeout).Out.Contents()
-	spaceGuid := cf.Cf("space", cfg.SpaceName, "--guid").Wait(defaultTimeout).Out.Contents()
+	// orgGuid := cf.Cf("org", cfg.OrgName, "--guid").Wait(defaultTimeout).Out.Contents()
+	// spaceGuid := cf.Cf("space", cfg.SpaceName, "--guid").Wait(defaultTimeout).Out.Contents()
 
-	url := fmt.Sprintf("/v2/apps?q=organization_guid:%s&q=space_guid:%s&results-per-page=%d&page=%d", strings.TrimSpace(string(orgGuid)), strings.TrimSpace(string(spaceGuid)), resultPerPage, page)
-	fmt.Printf("calling apps api : cf curl \"%s\"\n", url)
-	bytes, err := exec.Command("cf", "curl", url).CombinedOutput()
+	// url := fmt.Sprintf("/v2/apps?q=organization_guid:%s&q=space_guid:%s&results-per-page=%d&page=%d", strings.TrimSpace(string(orgGuid)), strings.TrimSpace(string(spaceGuid)), resultPerPage, page)
+	// fmt.Printf("calling apps api : cf curl \"%s\"\n", url)
+	// bytes, err := exec.Command("cf", "curl", url).CombinedOutput()
+	fmt.Printf("calling apps api : cf curl \"/v2/apps?results-per-page=%d&page=%d\"\n", resultPerPage, page)
+	bytes, err := exec.Command("cf", "curl", fmt.Sprintf("/v2/apps?results-per-page=%d&page=%d", resultPerPage, page)).CombinedOutput()
 	if err != nil {
 		Expect(err).ToNot(HaveOccurred())
 	}

@@ -76,21 +76,32 @@ func (c Config) GetExistingUser() string                        { return "" }
 func (c Config) GetExistingUserPassword() string                { return "" }
 func (c Config) GetShouldKeepUser() bool                        { return false }
 func (c Config) GetUseExistingUser() bool                       { return false }
-func (c Config) GetExistingOrganization() string                { return c.OrgName }
-func (c Config) GetExistingSpace() string                       { return c.SpaceName }
 func (c Config) GetSkipSSLValidation() bool                     { return true }
 func (c Config) GetNamePrefix() string                          { return "SCALING" }
 
+func (c Config) GetExistingSpace() string {
+	// if c.GetUseExistingSpace() == true {
+	// 	return c.SpaceName
+	// }
+	return ""
+}
+func (c Config) GetExistingOrganization() string {
+	// if c.GetUseExistingOrganization() == true {
+	// 	fmt.Print("here")
+	// 	return c.OrgName
+	// }
+	return ""
+}
 func (c Config) GetUseExistingOrganization() bool {
-	if c.OrgName != "" {
-		return true
-	}
+	// if c.OrgName != "" {
+	// 	return true
+	// }
 	return false
 }
 
 func (c Config) GetUseExistingSpace() bool {
-	if c.SpaceName != "" {
-		return true
-	}
+	// if c.SpaceName != "" {
+	// 	return true
+	// }
 	return false
 }
