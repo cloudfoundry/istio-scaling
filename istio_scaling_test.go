@@ -98,6 +98,8 @@ var _ = Describe("Istio scaling", func() {
 				fmt.Println("Sending results to datadog")
 				sendResultToDatadog(appsUpCount, testPlan.NumAppsToCurl)
 			}
+
+			Expect(passingActual).Should(BeNumerically(">=", testPlan.PassingThreshold))
 		})
 	})
 })
