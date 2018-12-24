@@ -31,6 +31,19 @@ func buildDatadogResponse(number int, metric string, timestamp time.Time) string
 	)
 }
 
+func postToDatadog(url string, data string) error {
+	client := http.DefaultClient
+
+	_, err := client.Post(url, "application/json", strings.NewReader(data))
+
+	if err != nil {
+		_, err := client.Post(url, "application/json", strings.NewReader(data))
+		return err
+	}
+
+	return nil
+}
+
 func sendResultToDatadog(numberSuccessfulCurls int, totalCurls int) {
 	timestamp := time.Now()
 
@@ -38,13 +51,18 @@ func sendResultToDatadog(numberSuccessfulCurls int, totalCurls int) {
 	totalData := buildDatadogResponse(totalCurls, "total", timestamp)
 
 	url := fmt.Sprintf("https://app.datadoghq.com/api/v1/series?api_key=%s", cfg.DatadogApiKey)
-	client := http.DefaultClient
 
-	_, err := client.Post(url, "application/json", strings.NewReader(successData))
-	Expect(err).NotTo(HaveOccurred())
+	err := postToDatadog(url, successData)
+	if err != nil {
+		fmt.Printf("Error sending data to Datadog: %+v\n", err)
+		return
+	}
+	err = postToDatadog(url, totalData)
+	if err != nil {
+		fmt.Printf("Error sending data to Datadog: %+v\n", err)
+		return
+	}
 
-	_, err = client.Post(url, "application/json", strings.NewReader(totalData))
-	Expect(err).NotTo(HaveOccurred())
 	fmt.Println("Results sent to datadog!")
 }
 
