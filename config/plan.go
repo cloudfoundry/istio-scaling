@@ -9,12 +9,13 @@ import (
 )
 
 type TestPlan struct {
-	NumAppsToPush int    `json:"number_of_apps_to_push"`
-	NumAppsToCurl int    `json:"number_of_apps_to_curl"`
-	AppMemSize    string `json:"app_mem_size" default:"16M"`
-	AppInstances  int    `json:"app_instances"`
-	Concurrency   int    `json:"app_push_concurrency"`
-	Cleanup       bool   `json:"cleanup"`
+	NumAppsToPush    int     `json:"number_of_apps_to_push"`
+	NumAppsToCurl    int     `json:"number_of_apps_to_curl"`
+	AppMemSize       string  `json:"app_mem_size" default:"16M"`
+	AppInstances     int     `json:"app_instances"`
+	PassingThreshold float32 `json:"passing_threshold"`
+	Concurrency      int     `json:"app_push_concurrency"`
+	Cleanup          bool    `json:"cleanup"`
 }
 
 func NewPlan(path string) (TestPlan, error) {
@@ -41,6 +42,9 @@ func (c *TestPlan) Validate() error {
 	}
 	if c.NumAppsToCurl < c.NumAppsToPush {
 		return errors.New(("number_of_apps_to_curl must be >= number_of_apps_to_push"))
+	}
+	if c.PassingThreshold == 0 {
+		return errors.New(("passing_threshold must be set"))
 	}
 	if c.AppInstances == 0 {
 		missingProperties = append(missingProperties, "app_instances")

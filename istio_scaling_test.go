@@ -87,8 +87,12 @@ var _ = Describe("Istio scaling", func() {
 				}
 			}
 
+			passingActual := float32(appsUpCount) / float32(testPlan.NumAppsToCurl) * 100
+
 			fmt.Println("RESULTS:")
 			fmt.Printf("  %d out of %d curls successful\n", appsUpCount, testPlan.NumAppsToCurl)
+			fmt.Printf("  Passing Threshold: %f%%\n", testPlan.PassingThreshold)
+			fmt.Printf("  Passing Actual: %f%%\n", passingActual)
 
 			if cfg.DatadogApiKey != "" {
 				fmt.Println("Sending results to datadog")

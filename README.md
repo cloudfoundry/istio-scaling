@@ -27,6 +27,7 @@ cat << EOF > "${PWD}/plan.json"
 {
   "number_of_apps_to_push": 10,
   "number_of_apps_to_curl": 10,
+  "passing_threshold": 99.9,
   "app_instances": 1,
   "app_mem_size": "16M",
   "cleanup": false
@@ -36,6 +37,9 @@ EOF
 `number_of_apps_to_curl` must be greater than or equal to `number_of_apps_push`.
 If greater than, then the test suite is able to curl already-existing apps which
 allows for incremental scaling.
+
+`passing_threshold` is the percentage of curls that must succeed for the test
+to pass. e.g. 99.9%
 
 ## Running Tests
 ```sh
