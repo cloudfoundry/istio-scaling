@@ -11,7 +11,7 @@ import (
 type TestPlan struct {
 	NumAppsToPush    int     `json:"number_of_apps_to_push"`
 	NumAppsToCurl    int     `json:"number_of_apps_to_curl"`
-	AppMemSize       string  `json:"app_mem_size" default:"16M"`
+	AppMemSize       string  `json:"app_mem_size"`
 	AppInstances     int     `json:"app_instances"`
 	PassingThreshold float32 `json:"passing_threshold"`
 	Concurrency      int     `json:"app_push_concurrency"`
@@ -51,6 +51,9 @@ func (c *TestPlan) Validate() error {
 	}
 	if c.Concurrency == 0 {
 		c.Concurrency = 16
+	}
+	if c.AppMemSize == "" {
+		c.AppMemSize = "16M"
 	}
 	if len(missingProperties) > 0 {
 		return fmt.Errorf("Missing required config properties: %s", strings.Join(missingProperties, ", "))
